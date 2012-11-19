@@ -11,3 +11,18 @@ project/plugins/project/
 
 # Scala-IDE specific
 .scala_dependencies
+
+#Linux
+*~
+
+#Idea 
+*.iml
+.idea/
+.settings/
+.cache
+
+#Eclipse
+.classpath
+
+#Emacs
+#*#

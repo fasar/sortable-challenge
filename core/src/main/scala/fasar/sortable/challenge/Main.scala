@@ -65,6 +65,7 @@ object Main {
 
     val dateEndInit = getDate
 
+    println("Load data files")
     // Load data
     // get parallel collection of products to use multi-processors
     val listProds: ParSeq[Product] = loadProductData(file1URI).par
@@ -72,6 +73,7 @@ object Main {
 
     val dateEndLoadData = getDate
 
+    println("Start processing")
     // Process record linkage
     val listLink =
       for (prod <- listProds)
