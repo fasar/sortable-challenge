@@ -13,6 +13,8 @@ import scala.collection.parallel.ParSeq
 import java.io.PrintWriter
 import scala.util.parsing.json.JSON
 import scala.util.matching.Regex
+import scala.collection.parallel.immutable.ParHashSet
+import scala.collection.immutable.HashSet
 
 /**The main object used to execute sortable challenge on the command-line.
  *
@@ -68,36 +70,71 @@ object Main {
     println("Load data files")
     // Load data
     // get parallel collection of products to use multi-processors
-    val listProds: ParSeq[Product] = loadProductData(file1URI).par
-    val listItems: ParSeq[Item] = loadItemData(file2URI).par
+    // and order products by the most informative in first 
+    val listProds: ParSeq[Product] = loadProductData(file1URI).sortWith(_.isGreaterThan(_)).par
+    val listItems: Seq[Item] = loadItemData(file2URI)
 
     val dateEndLoadData = getDate
 
     println("Start processing")
-    // Process record linkage
-    val listLink =
-      for (prod <- listProds)
+    
+    // Process record linkage of product with family
+    val listLinkWithFamily =
+      for (prod <- listProds
+           if prod.hasFamily)
       yield {
         log.trace("Product processed : " + prod)
         val modelReg = RegexHelper.makeAcronymRegex(prod.model.toLowerCase)
         val familyReg = RegexHelper.makeAcronymRegex(prod.family.toLowerCase)
 
+        // get items with max information - c.f. all items have a family
         val itemsProd =
           for (item <- listItems
                if item.manufacturer.toLowerCase == prod.manufacturer.toLowerCase &&
-                 (!prod.hasFamily || isContained(item.title.toLowerCase, familyReg)) &&
+                 isContained(item.title.toLowerCase, familyReg) &&
                  isContained(item.title.toLowerCase, modelReg)
           )
           yield {
             item
           }
-        JsonTools.getJson(Link(prod, itemsProd.toList))
+        Link(prod, itemsProd.toList)
       }
+    
+    // get the items already linked with a product
+    val alreadyLinked = listLinkWithFamily.foldLeft(HashSet.empty[Item]){ (set, link) => set ++ link.items  }
+    val listItemsMinus = listItems.toSet.par &~ alreadyLinked
+    
+    // Process record linkage of product without family
+    val listLinkWithoutFamily =
+      for (prod <- listProds
+           if !prod.hasFamily)
+      yield {
+        log.trace("Product processed : " + prod)
+        val modelReg = RegexHelper.makeAcronymRegex(prod.model.toLowerCase)
+        val familyReg = RegexHelper.makeAcronymRegex(prod.family.toLowerCase)
 
+        // get items with max information - c.f. all items have a family
+        val itemsProd =
+          for (item <- listItemsMinus 
+                 if item.manufacturer.toLowerCase == prod.manufacturer.toLowerCase &&
+                 isContained(item.title.toLowerCase, familyReg) &&
+                 isContained(item.title.toLowerCase, modelReg)
+          )
+          yield {
+            item
+          }
+        Link(prod, itemsProd.toList)
+      }    
+
+    // process result
+    val links =  listLinkWithFamily ++ listLinkWithoutFamily
+    
+        
+        
     val dateEndProcess = getDate
 
     val pout = new PrintWriter(outFic)
-    listLink.toList.foreach(pout.println)
+    links.toList.foreach {x => pout.println(JsonTools.getJson(x)) }
 
     val dateEndWriting = getDate
 

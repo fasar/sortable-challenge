@@ -23,6 +23,24 @@ case class Product(
                     family: String = "") {
 
   def hasFamily = family.size > 0
+  
+  def isGreaterThan(p: Product): Boolean = {
+    val sizeThisModelNb = this.model.foldLeft(0){ (nb, c) => nb + charWeight(c)}
+    val sizePModelNb = p.model.foldLeft(0){ (nb, c) => nb + charWeight(c)}
+    
+    if(sizeThisModelNb > sizePModelNb) true
+    else if (sizeThisModelNb < sizePModelNb) false
+    else if(this.model.size > p.model.size ) true
+    else if(this.model.size < p.model.size ) false
+    else if(this.hasFamily && ! p.hasFamily) true
+    else if(! this.hasFamily && p.hasFamily) false
+    else this.name > p.name
+  }
+  
+  def charWeight(c:Char) = {
+    if(c >= '0' && c <= '9' ) 1
+    else 0
+  }
 }
 
 /**
