@@ -102,9 +102,9 @@ object RawJsonData {
 {"title":"Panasonic Lumix DMC-ZR3 14.1 MP Digital Camera with 8x Optical Image Stabilized Zoom and 2.7-Inch LCD (Blue)","manufacturer":"Panasonic","currency":"CAD","price":"299.99"}
 {"title":"Olympus VG-320 14 MP Superwide 12.5x Zoom (24mm), 3\" LCD, Metal Body, HD Movie, Magic Filters, iAuto, Dual Image Stabilization, AF Tracking (Red)","manufacturer":"Olympus Canada","currency":"CAD","price":"199.99"}
 {"title":"Olympus VG-320 14 MP Superwide 12.5x Zoom (24mm), 3\" LCD, Metal Body, HD Movie, Magic Filters, iAuto, Dual Image Stabilization, AF Tracking (Red)","manufacturer":"Olympus Canada","currency":"CAD","price":"248.97"}
-"""
-    
-    val products = """{"product_name":"Sony_Cyber-shot_DSC-W310","manufacturer":"Sony","model":"DSC-W310","family":"Cyber-shot","announced-date":"2010-01-06T19:00:00.000-05:00"}
+                 """
+
+  val products = """{"product_name":"Sony_Cyber-shot_DSC-W310","manufacturer":"Sony","model":"DSC-W310","family":"Cyber-shot","announced-date":"2010-01-06T19:00:00.000-05:00"}
 {"product_name":"Samsung_TL240","manufacturer":"Samsung","model":"TL240","announced-date":"2010-01-05T19:00:00.000-05:00"}
 {"product_name":"Nikon-s6100","manufacturer":"Nikon","model":"S6100","family":"Coolpix","announced-date":"2011-02-08T19:00:00.000-05:00"}
 {"product_name":"Samsung_TL220","manufacturer":"Samsung","model":"TL220","announced-date":"2009-08-12T20:00:00.000-04:00"}
@@ -204,5 +204,5 @@ object RawJsonData {
 {"product_name":"Panasonic-FP7","manufacturer":"Panasonic","model":"DMC-FP7","family":"Lumix","announced-date":"2011-01-05T19:00:00.000-05:00"}
 {"product_name":"Pentax_Optio_H90","manufacturer":"Pentax","model":"H90","family":"Optio","announced-date":"2010-01-24T19:00:00.000-05:00"}
 {"product_name":"Olympus-T100","manufacturer":"Olympus","model":"T100","announced-date":"2010-03-20T20:00:00.000-04:00"}
-"""
+                 """
 }

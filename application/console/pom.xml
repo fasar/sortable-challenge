@@ -1,75 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
+    <parent>
+        <groupId>fasar.sortable.challenge</groupId>
+        <artifactId>sortable-challenge</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!--CHALLENGE_VERSION-->
+        <relativePath>../..</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
     <groupId>fasar.sortable.challenge</groupId>
-    <artifactId>sortable-challenge</artifactId>
-    <version>1.0-SNAPSHOT</version><!--CHALLENGE_VERSION-->
-    <relativePath>../..</relativePath>
-  </parent>
+    <artifactId>console</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <!--CHALLENGE_VERSION-->
+    <name>Application zip</name>
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fasar.sortable.challenge</groupId>
-  <artifactId>console</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version><!--CHALLENGE_VERSION-->
-  <name>Application zip</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <finalName>sortable-challenge</finalName>
+                    <descriptors>
+                        <descriptor>src/assembly/dist.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>package-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>install-assembly</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>deploy-assembly</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <finalName>sortable-challenge</finalName>
-          <descriptors>
-            <descriptor>src/assembly/dist.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>package-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attached</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>install-assembly</id>
-            <phase>install</phase>
-            <goals>
-              <goal>attached</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>deploy-assembly</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>attached</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>fasar.sortable.challenge</groupId>
-      <artifactId>core</artifactId>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>fasar.sortable.challenge</groupId>
+            <artifactId>core</artifactId>
+        </dependency>
 
 
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 
 
 </project>

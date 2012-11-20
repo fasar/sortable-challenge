@@ -19,24 +19,24 @@
     </dependencySets>
 
     <fileSets>
-      <fileSet>
-        <directory>src/main/resources</directory>
-        <outputDirectory></outputDirectory>
-      </fileSet>
-      <fileSet>
-        <directory>src/main/resources/bin</directory>
-        <outputDirectory>bin</outputDirectory>
-        <fileMode>0755</fileMode>
-      </fileSet>
-      <fileSet>
-        <directory>src/main/resources/conf</directory>
-        <includes>
-          <include>*.properties</include>
-          <include>*.xml</include>
-          <include>*.conf</include>
-        </includes>
-        <outputDirectory>conf</outputDirectory>
-      </fileSet>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/conf</directory>
+            <includes>
+                <include>*.properties</include>
+                <include>*.xml</include>
+                <include>*.conf</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
     </fileSets>
 
 </assembly>

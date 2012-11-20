@@ -28,10 +28,10 @@ object JsonTools {
   }
 
   /** get json data of an list of item
-   *
-   * @param items list of item
-   * @return json data
-   */
+    *
+    * @param items list of item
+    * @return json data
+    */
   private def getJsonItems(items: List[Item]): String = {
     val itemsJson =
       for (item <- items)
@@ -48,10 +48,10 @@ object JsonTools {
 
 
   /** get json data of an item
-   *
-   * @param item the item
-   * @return json data of the item
-   */
+    *
+    * @param item the item
+    * @return json data of the item
+    */
   private def getJsonItem(item: Item): String = {
     val str = new StringBuilder
 

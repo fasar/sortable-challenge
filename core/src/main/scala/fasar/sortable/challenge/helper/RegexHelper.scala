@@ -39,8 +39,8 @@ object RegexHelper {
     val delim = delimiters.mkString("(", "|", ")")
     val escapedAcronyme = regexEscape(acronym)
     val patternR = escapedAcronyme.replaceAll("-", ".?")
-                                .replaceAll("_", ".?")
-                                .replaceAll(" ", ".?")
+      .replaceAll("_", ".?")
+      .replaceAll(" ", ".?")
     (delim + patternR + delim).r
   }
 
@@ -49,8 +49,10 @@ object RegexHelper {
     * @param txt  source
     * @return     compatible regex text
     */
-  def regexEscape(txt:String): String = {
-    txt.map{ escapeRegexChar }.mkString
+  def regexEscape(txt: String): String = {
+    txt.map {
+      escapeRegexChar
+    }.mkString
   }
 
   /** escape a character

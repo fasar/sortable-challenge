@@ -13,13 +13,12 @@ import scala.collection.parallel.ParSeq
 import java.io.PrintWriter
 import scala.util.parsing.json.JSON
 import scala.util.matching.Regex
-import scala.collection.parallel.immutable.ParHashSet
 import scala.collection.immutable.HashSet
 
-/**The main object used to execute sortable challenge on the command-line.
- *
- * @author Fabien Sartor
- */
+/** The main object used to execute sortable challenge on the command-line.
+  *
+  * @author Fabien Sartor
+  */
 object Main {
   private val log: Log = LogFactory.getLog(this.getClass)
 
@@ -69,72 +68,26 @@ object Main {
 
     println("Load data files")
     // Load data
-    // get parallel collection of products to use multi-processors
     // and order products by the most informative in first 
-    val listProds: ParSeq[Product] = loadProductData(file1URI).sortWith(_.isGreaterThan(_)).par
-    val listItems: Seq[Item] = loadItemData(file2URI)
+    val listProds: Seq[Product] = loadProductData(file1URI).sortWith(_.isMoreInformativeThan(_))
+    // get parallel collection of products to use multi-processors
+    val listItems: ParSeq[Item] = loadItemData(file2URI).par
 
     val dateEndLoadData = getDate
 
+
     println("Start processing")
-    
+
     // Process record linkage of product with family
-    val listLinkWithFamily =
-      for (prod <- listProds
-           if prod.hasFamily)
-      yield {
-        log.trace("Product processed : " + prod)
-        val modelReg = RegexHelper.makeAcronymRegex(prod.model.toLowerCase)
-        val familyReg = RegexHelper.makeAcronymRegex(prod.family.toLowerCase)
+    val links = getLinks(listProds, listItems)
 
-        // get items with max information - c.f. all items have a family
-        val itemsProd =
-          for (item <- listItems
-               if item.manufacturer.toLowerCase == prod.manufacturer.toLowerCase &&
-                 isContained(item.title.toLowerCase, familyReg) &&
-                 isContained(item.title.toLowerCase, modelReg)
-          )
-          yield {
-            item
-          }
-        Link(prod, itemsProd.toList)
-      }
-    
-    // get the items already linked with a product
-    val alreadyLinked = listLinkWithFamily.foldLeft(HashSet.empty[Item]){ (set, link) => set ++ link.items  }
-    val listItemsMinus = listItems.toSet.par &~ alreadyLinked
-    
-    // Process record linkage of product without family
-    val listLinkWithoutFamily =
-      for (prod <- listProds
-           if !prod.hasFamily)
-      yield {
-        log.trace("Product processed : " + prod)
-        val modelReg = RegexHelper.makeAcronymRegex(prod.model.toLowerCase)
-        val familyReg = RegexHelper.makeAcronymRegex(prod.family.toLowerCase)
 
-        // get items with max information - c.f. all items have a family
-        val itemsProd =
-          for (item <- listItemsMinus 
-                 if item.manufacturer.toLowerCase == prod.manufacturer.toLowerCase &&
-                 isContained(item.title.toLowerCase, familyReg) &&
-                 isContained(item.title.toLowerCase, modelReg)
-          )
-          yield {
-            item
-          }
-        Link(prod, itemsProd.toList)
-      }    
-
-    // process result
-    val links =  listLinkWithFamily ++ listLinkWithoutFamily
-    
-        
-        
     val dateEndProcess = getDate
 
     val pout = new PrintWriter(outFic)
-    links.toList.foreach {x => pout.println(JsonTools.getJson(x)) }
+    links.toList.foreach {
+      x => pout.println(JsonTools.getJson(x))
+    }
 
     val dateEndWriting = getDate
 
@@ -151,6 +104,7 @@ object Main {
 
   /** get current date. */
   private def getDate = Calendar.getInstance.getTimeInMillis
+
 
   /** Prints usage information for scalap. */
   private def usage(args: Seq[String]): Unit = {
@@ -199,6 +153,7 @@ object Main {
       map => Product.getProduct(map)
     }
   }
+
   /** Load listing data
     *
     * @param file  uri of the file to load items
@@ -233,6 +188,50 @@ object Main {
     res
   }
 
+
+  /** get a list of links between products and items
+   *
+   * @param products       the reference products
+   * @param listItems      the listing you want to link with products
+   * @return
+   */
+  private def getLinks(products: Seq[Product], listItems: ParSeq[Item]) = {
+    @tailrec
+    def loop_getLinks(products: Seq[Product], alreadyLinked: Set[Item], acc: List[Link]): List[Link] = {
+      products match {
+        case Nil => acc
+        case prod :: xs =>
+          log.trace("Product processed : " + prod)
+          val link = getLink(prod, listItems, alreadyLinked)
+          loop_getLinks(xs, listItems, alreadyLinked ++ link.items, link :: acc)
+      }
+    }
+
+    loop_getLinks(listProds, HashSet.empty[Item], Nil)
+  }
+
+  /** get link between products and items
+   *
+   * @param product
+   * @param listItems
+   * @param alreadyLinked
+   * @return
+   */
+  private def getLink(product: Product, listItems: ParSeq[Item], alreadyLinked: Set[Item]): Link = {
+    val modelReg = RegexHelper.makeAcronymRegex(product.model.toLowerCase)
+    val familyReg = RegexHelper.makeAcronymRegex(product.family.toLowerCase)
+
+    val itemsProd =
+      for (item <- listItems
+           if item.manufacturer.toLowerCase == product.manufacturer.toLowerCase &&
+             isContained(item.title.toLowerCase, familyReg) &&
+             isContained(item.title.toLowerCase, modelReg)
+      )
+      yield {
+        item
+      }
+    Link(product, itemsProd.toList)
+  }
 
 
   /** Find if src contains the regex pattern cont

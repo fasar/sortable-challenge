@@ -22,8 +22,8 @@ case class Item(title: String,
 }
 
 /**
-  * Item object to build item.
-  */
+ * Item object to build item.
+ */
 object Item {
   /** get a product from a Map[String, String]
     *
