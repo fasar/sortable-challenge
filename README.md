@@ -1,9 +1,9 @@
-sortable-challenge
+Sortable-challenge
 ==================
 
 This application link syntatically different entities that describe the same object.
 
-The goal is proposed by [Sortable]: http://sortable.com/blog/coding-challenge/
+This challenge is proposed by [Sortable]: http://sortable.com/blog/coding-challenge/
 
 
 # Build application
