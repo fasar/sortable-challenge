@@ -1,11 +1,9 @@
 package fasar.sortable.challenge.model
 
-
 import org.scalatest.FunSuite
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
 
 @RunWith(classOf[JUnitRunner])
 class ModelTest extends FunSuite {
@@ -29,5 +27,21 @@ class ModelTest extends FunSuite {
       assert(listProds.sortWith(_.isMoreInformativeThan(_)) === listSorted)
       assert(listProds.sortWith(!_.isMoreInformativeThan(_)) === listSorted.reverse)
     }
+  }
+
+  test("Usd is less than Euro") {
+    val euroCur = Currency.getWithSymbol("EUR")
+    val euroVal = 1
+    val euroPrice = Price(euroCur.get, euroVal)
+    val usdVal = euroPrice.getUsdPrice
+    assert(euroVal <  usdVal)
+  }
+
+  test("Euro is less than GBP (british pound)") {
+    val euroCur = Currency.getWithSymbol("EUR")
+    val euroVal = 1
+    val euroPrice = Price(euroCur.get, euroVal)
+    val gbpPrice = euroPrice.convertTo(Currency.getWithSymbol("GBP").get)
+    assert(gbpPrice.value < euroVal)
   }
 }

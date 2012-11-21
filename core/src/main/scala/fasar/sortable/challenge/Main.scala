@@ -1,9 +1,10 @@
 package fasar.sortable.challenge
 
 import fasar.sortable.challenge.model._
-import fasar.sortable.challenge.jsonTools.JsonTools
+import fasar.sortable.challenge.converter.Converter
+import fasar.sortable.challenge.converter.impl._
 import fasar.sortable.challenge.helper._
-import io.Source
+import scala.io.Source
 import org.apache.commons.logging.{Log, LogFactory}
 import java.net.URI
 import java.util.Properties
@@ -14,6 +15,7 @@ import java.io.PrintWriter
 import scala.util.parsing.json.JSON
 import scala.util.matching.Regex
 import scala.collection.immutable.HashSet
+import fasar.sortable.challenge.business.PriceFilter
 
 /** The main object used to execute sortable challenge on the command-line.
   *
@@ -80,14 +82,15 @@ object Main {
 
     // Process record linkage of product with family
     val links = getLinks(listProds, listItems)
-
-
+    
+    val filtredLink = filtreLink(links)
+    
     val dateEndProcess = getDate
 
+    //Write output
+    val converter = CsvConverter //JsonConverter
     val pout = new PrintWriter(outFic)
-    links.toList.foreach {
-      x => pout.println(JsonTools.getJson(x))
-    }
+    pout.write(converter convert links)
 
     val dateEndWriting = getDate
 
@@ -203,11 +206,24 @@ object Main {
         case prod :: xs =>
           log.trace("Product processed : " + prod)
           val link = getLink(prod, listItems, alreadyLinked)
-          loop_getLinks(xs, listItems, alreadyLinked ++ link.items, link :: acc)
+          
+          //print listing below average minus standard deviation
+          val average =  PriceFilter.getAverageUsdPrice(link).value
+          val stdDeviation = PriceFilter.getStardarDeviationUsdPrice(link)
+          log.trace("Average price is     : " + average + " usd")
+          log.trace("Standar deviation is : " + stdDeviation + " usd")
+          log.trace("Number of items in listing : " + link.items.size + " items")
+          for(item <- link.items;
+              if(item.price.toDouble < average - stdDeviation*2)) {
+            log.debug("avoided items : " + item)
+          }
+          
+          
+          loop_getLinks(xs, alreadyLinked ++ link.items, link :: acc)
       }
     }
-
-    loop_getLinks(listProds, HashSet.empty[Item], Nil)
+ 
+    loop_getLinks(products, HashSet.empty[Item], Nil)
   }
 
   /** get link between products and items
@@ -223,9 +239,9 @@ object Main {
 
     val itemsProd =
       for (item <- listItems
-           if item.manufacturer.toLowerCase == product.manufacturer.toLowerCase &&
-             isContained(item.title.toLowerCase, familyReg) &&
-             isContained(item.title.toLowerCase, modelReg)
+           if true && //item.manufacturer.toLowerCase == product.manufacturer.toLowerCase &&
+             isContained(item.title.toLowerCase, modelReg) &&
+             (!product.hasFamily || isContained(item.title.toLowerCase, familyReg))
       )
       yield {
         item
@@ -242,5 +258,11 @@ object Main {
     */
   private def isContained(src: String, cont: Regex): Boolean = {
     cont.findFirstIn(src).isDefined
+  }
+  
+  
+  private def filtreLink(links:List[Link]): List[Link] = {
+    
+    links
   }
 }

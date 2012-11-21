@@ -1,15 +1,29 @@
-package fasar.sortable.challenge.jsonTools
+package fasar.sortable.challenge.converter.impl
 
 import fasar.sortable.challenge.model._
-
 import scala.collection.mutable.StringBuilder
+import fasar.sortable.challenge.converter.Converter
 
 /** Some tools to generate Json data
   *
   * @author Fabien Sartor
   */
-object JsonTools {
-
+object JsonConverter extends Converter {
+  
+  /** Create a JSon file of links 
+    * 
+    * It get the JSon data of a list of links.
+    * A link is a relation between a product and a listing
+    *
+    * @param link  the link
+    * @return      content of JSon file
+    */
+  def convert(links: List[Link]): String = {
+    val res = links.map { x => convert(x) }
+    res.mkString("\n")
+  }
+  
+  
   /** get the JSon data of a link
     *
     * a link is a relation between a product and a listing
@@ -17,7 +31,7 @@ object JsonTools {
     * @param link  the link
     * @return      json data
     */
-  def getJson(link: Link): String = {
+  def convert(link: Link): String = {
     val str = new StringBuilder
     str append """{"product-name":""""
     str append escapeJson(link.product.name)

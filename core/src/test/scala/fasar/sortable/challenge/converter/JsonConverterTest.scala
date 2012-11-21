@@ -1,11 +1,11 @@
-package jsonTools
+package fasar.sortable.challenge.converter
 
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-
 import fasar.sortable.challenge.model._
-import fasar.sortable.challenge.jsonTools._
+import fasar.sortable.challenge.converter.impl.JsonConverter
+
 
 
 @RunWith(classOf[JUnitRunner])
@@ -28,19 +28,19 @@ class JsonTest extends FunSuite {
 
   new TestSet {
     test("test json a product with a family") {
-      val res = JsonTools.getJson(link1)
+      val res = JsonConverter.convert(link1)
       println(res)
       assert(res === resLink1)
     }
 
     test("test json a product with no family") {
-      val res = JsonTools.getJson(link2)
+      val res = JsonConverter.convert(link2)
       println(res)
       assert(res === resLink2)
     }
 
     test("test json a product without items") {
-      val res = JsonTools.getJson(linkEmptyItems)
+      val res = JsonConverter.convert(linkEmptyItems)
       println(res)
       assert(res === resEmptyItems)
     }

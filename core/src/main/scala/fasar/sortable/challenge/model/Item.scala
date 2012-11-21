@@ -18,7 +18,18 @@ case class Item(title: String,
                 manufacturer: String,
                 currency: String,
                 price: String) {
-
+  
+  def getPrice: Option[Price] = {
+    try {
+      val priceValue = this.price.toDouble
+      val currency = Currency.getWithSymbol(this.currency)
+      if(currency.isDefined) Some(Price(currency.get, priceValue))
+      else None
+    } catch {
+      case e:Exception => None
+    }
+    
+  }
 }
 
 /**

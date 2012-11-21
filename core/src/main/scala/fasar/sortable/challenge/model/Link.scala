@@ -7,5 +7,4 @@ case class Link(product: Product,
   def +(item: Item) = {
     Link(product, item :: items)
   }
-
 }
