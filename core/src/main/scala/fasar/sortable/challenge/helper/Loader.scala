@@ -1,10 +1,9 @@
 package fasar.sortable.challenge.helper
 
-
 import java.lang.reflect.InvocationTargetException
-import org.apache.commons.logging.{LogFactory, Log}
-import java.io.{File, InterruptedIOException}
-import java.net.{URI, URL}
+import org.apache.commons.logging.{ LogFactory, Log }
+import java.io.{ File, InterruptedIOException }
+import java.net.{ URI, URL }
 
 /** Helper to handle resources
   *
@@ -68,7 +67,6 @@ object Loader {
     ClassLoader.getSystemResource(resource)
   }
 
-
   /** Get a URI of file in classpath or in the har disk
     *
     * This function looks in all classpath to get a resource.
@@ -98,12 +96,11 @@ object Loader {
     }
   }
 
-  /**
-   * Get the Thread Context Loader which is a JDK 1.2 feature. If we
-   * are running under JDK 1.1 or anything else goes wrong the method
-   * returns <code>null<code>.
-   *
-   **/
+  /** Get the Thread Context Loader which is a JDK 1.2 feature. If we
+    * are running under JDK 1.1 or anything else goes wrong the method
+    * returns <code>null<code>.
+    *
+    */
   private def getTCL: ClassLoader = {
     Thread.currentThread.getContextClassLoader
   }

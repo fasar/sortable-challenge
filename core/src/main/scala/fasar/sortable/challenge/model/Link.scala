@@ -1,6 +1,5 @@
 package fasar.sortable.challenge.model
 
-
 case class Link(product: Product,
                 items: List[Item]) {
 

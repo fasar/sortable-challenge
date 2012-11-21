@@ -9,9 +9,9 @@ import fasar.sortable.challenge.converter.Converter
   * @author Fabien Sartor
   */
 object JsonConverter extends Converter {
-  
-  /** Create a JSon file of links 
-    * 
+
+  /** Create a JSon file of links
+    *
     * It get the JSon data of a list of links.
     * A link is a relation between a product and a listing
     *
@@ -22,8 +22,7 @@ object JsonConverter extends Converter {
     val res = links.map { x => convert(x) }
     res.mkString("\n")
   }
-  
-  
+
   /** get the JSon data of a link
     *
     * a link is a relation between a product and a listing
@@ -48,8 +47,7 @@ object JsonConverter extends Converter {
     */
   private def getJsonItems(items: List[Item]): String = {
     val itemsJson =
-      for (item <- items)
-      yield {
+      for (item <- items) yield {
         getJsonItem(item)
       }
 
@@ -59,7 +57,6 @@ object JsonConverter extends Converter {
     str append "]"
     str toString
   }
-
 
   /** get json data of an item
     *
@@ -91,15 +88,15 @@ object JsonConverter extends Converter {
       src.map {
         (x: Char) =>
           x match {
-            case '"' => """\""""
+            case '"'  => """\""""
             case '\\' => """\\"""
-            case '/' => """\/"""
+            case '/'  => """\/"""
             case '\b' => """\b"""
             case '\f' => """\f"""
             case '\n' => """\n"""
             case '\r' => """\r"""
             case '\t' => """\t"""
-            case e => e.toString()
+            case e    => e.toString()
           }
       }
     res.mkString

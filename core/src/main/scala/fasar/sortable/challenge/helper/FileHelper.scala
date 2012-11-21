@@ -18,7 +18,6 @@ import java.io.PrintWriter
 object FileHelper {
   private val log: Log = LogFactory.getLog(this.getClass)
 
-
   /** load property file
     *
     */

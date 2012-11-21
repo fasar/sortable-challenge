@@ -1,13 +1,11 @@
 package fasar.sortable.challenge.model
 
-
 import org.scalatest.FunSuite
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scala.util.parsing.json._
-
 
 @RunWith(classOf[JUnitRunner])
 class ModelJsonImportTest extends FunSuite {
@@ -24,8 +22,7 @@ class ModelJsonImportTest extends FunSuite {
   new TestSets {
     test("load some products") {
       val products =
-        for (jsonProduct <- listProd)
-        yield {
+        for (jsonProduct <- listProd) yield {
           val productOpt = JSON.parseFull(jsonProduct)
           val product = productOpt.get
           Product.getProduct(product.asInstanceOf[Map[String, String]])
@@ -34,12 +31,9 @@ class ModelJsonImportTest extends FunSuite {
       println(products(0))
     }
 
-
-
     test("load some items in listing") {
       val items =
-        for (jsonItem <- listItems)
-        yield {
+        for (jsonItem <- listItems) yield {
           val productOpt = JSON.parseFull(jsonItem)
           val product = productOpt.get
           Item.getItem(product.asInstanceOf[Map[String, String]])
@@ -47,7 +41,6 @@ class ModelJsonImportTest extends FunSuite {
       assert(items.size === prodToRead)
       println(items(0))
     }
-
 
   }
 }

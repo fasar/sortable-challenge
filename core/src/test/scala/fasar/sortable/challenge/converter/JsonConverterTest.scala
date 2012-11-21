@@ -6,8 +6,6 @@ import org.scalatest.junit.JUnitRunner
 import fasar.sortable.challenge.model._
 import fasar.sortable.challenge.converter.impl.JsonConverter
 
-
-
 @RunWith(classOf[JUnitRunner])
 class JsonTest extends FunSuite {
 

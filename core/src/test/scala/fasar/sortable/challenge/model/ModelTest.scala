@@ -34,7 +34,7 @@ class ModelTest extends FunSuite {
     val euroVal = 1
     val euroPrice = Price(euroCur.get, euroVal)
     val usdVal = euroPrice.getUsdPrice
-    assert(euroVal <  usdVal)
+    assert(euroVal < usdVal)
   }
 
   test("Euro is less than GBP (british pound)") {

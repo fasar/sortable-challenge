@@ -5,7 +5,7 @@ import fasar.sortable.challenge.converter.Converter
 import fasar.sortable.challenge.converter.impl._
 import fasar.sortable.challenge.helper._
 import scala.io.Source
-import org.apache.commons.logging.{Log, LogFactory}
+import org.apache.commons.logging.{ Log, LogFactory }
 import java.net.URI
 import java.util.Properties
 import scala.annotation.tailrec
@@ -15,7 +15,8 @@ import java.io.PrintWriter
 import scala.util.parsing.json.JSON
 import scala.util.matching.Regex
 import scala.collection.immutable.HashSet
-import fasar.sortable.challenge.business.PriceFilter
+import fasar.sortable.challenge.business.PriceHandler
+import java.io.File
 
 /** The main object used to execute sortable challenge on the command-line.
   *
@@ -40,14 +41,13 @@ object Main {
     }
 
     args foreach {
-      case "-h" => usage(args); System.exit(0)
+      case "-h"     => usage(args); System.exit(0)
       case "--help" => usage(args); System.exit(0)
-      case _ =>
+      case _        =>
     }
 
     // load properties from arguments
     val prop = loadArgsProperties(args)
-
 
     // open output file
     val outFic = FileHelper.getOutFic(prop)
@@ -77,25 +77,32 @@ object Main {
 
     val dateEndLoadData = getDate
 
-
     println("Start processing")
 
     // Process record linkage of product with family
     val links = getLinks(listProds, listItems)
-    
-    val filtredLink = filtreLink(links)
-    
+
+    // filter items with price too below the average price 
+    val filtredLinks = filterLinks(links)
+
     val dateEndProcess = getDate
 
     //Write output
-    val converter = CsvConverter //JsonConverter
+    val converter = JsonConverter
     val pout = new PrintWriter(outFic)
-    pout.write(converter convert links)
-
-    val dateEndWriting = getDate
+    pout.write(converter convert filtredLinks)
 
     // close output file
     pout.close()
+
+    // TODO: suppr these line after.
+    // it is for debug
+    val out2 = new PrintWriter(new File("/tmp/jsonNonFiltred.json"))
+    out2.write(converter convert links)
+    out2.flush()
+    out2.close()
+
+    val dateEndWriting = getDate
 
     log.debug("It takes " + (dateEndInit - dateStartApp) + " ms to init properties and file")
     log.debug("It takes " + (dateEndLoadData - dateEndInit) + " ms to load data")
@@ -107,7 +114,6 @@ object Main {
 
   /** get current date. */
   private def getDate = Calendar.getInstance.getTimeInMillis
-
 
   /** Prints usage information for scalap. */
   private def usage(args: Seq[String]): Unit = {
@@ -172,16 +178,15 @@ object Main {
     *
     * @param file    the file of the data
     * @param builder a function takes two parameter and return a type B.
-    *                First param is a map of Json data which link data name with data.
-    *                Second param is the json source.
+    *              First param is a map of Json data which link data name with data.
+    *              Second param is the json source.
     * @tparam B      Type
     * @return        A list of [B]
     */
   private def loadData[B](file: URI)(builder: Map[String, String] => B): List[B] = {
     val ficIn = Source.fromURI(file)
     val data =
-      for (line <- ficIn getLines)
-      yield {
+      for (line <- ficIn getLines) yield {
         val productOpt = JSON.parseFull(line)
         val product = productOpt.get
         builder(product.asInstanceOf[Map[String, String]])
@@ -191,13 +196,12 @@ object Main {
     res
   }
 
-
   /** get a list of links between products and items
-   *
-   * @param products       the reference products
-   * @param listItems      the listing you want to link with products
-   * @return
-   */
+    *
+    * @param products       the reference products
+    * @param listItems      the listing you want to link with products
+    * @return
+    */
   private def getLinks(products: Seq[Product], listItems: ParSeq[Item]) = {
     @tailrec
     def loop_getLinks(products: Seq[Product], alreadyLinked: Set[Item], acc: List[Link]): List[Link] = {
@@ -206,49 +210,34 @@ object Main {
         case prod :: xs =>
           log.trace("Product processed : " + prod)
           val link = getLink(prod, listItems, alreadyLinked)
-          
-          //print listing below average minus standard deviation
-          val average =  PriceFilter.getAverageUsdPrice(link).value
-          val stdDeviation = PriceFilter.getStardarDeviationUsdPrice(link)
-          log.trace("Average price is     : " + average + " usd")
-          log.trace("Standar deviation is : " + stdDeviation + " usd")
-          log.trace("Number of items in listing : " + link.items.size + " items")
-          for(item <- link.items;
-              if(item.price.toDouble < average - stdDeviation*2)) {
-            log.debug("avoided items : " + item)
-          }
-          
-          
+
           loop_getLinks(xs, alreadyLinked ++ link.items, link :: acc)
       }
     }
- 
+
     loop_getLinks(products, HashSet.empty[Item], Nil)
   }
 
   /** get link between products and items
-   *
-   * @param product
-   * @param listItems
-   * @param alreadyLinked
-   * @return
-   */
+    *
+    * @param product
+    * @param listItems
+    * @param alreadyLinked
+    * @return
+    */
   private def getLink(product: Product, listItems: ParSeq[Item], alreadyLinked: Set[Item]): Link = {
     val modelReg = RegexHelper.makeAcronymRegex(product.model.toLowerCase)
-    val familyReg = RegexHelper.makeAcronymRegex(product.family.toLowerCase)
+    lazy val familyReg = RegexHelper.makeAcronymRegex(product.family.toLowerCase)
 
     val itemsProd =
-      for (item <- listItems
-           if true && //item.manufacturer.toLowerCase == product.manufacturer.toLowerCase &&
-             isContained(item.title.toLowerCase, modelReg) &&
-             (!product.hasFamily || isContained(item.title.toLowerCase, familyReg))
-      )
-      yield {
+      for (
+        item <- listItems if (isContained(item.title.toLowerCase, modelReg) &&
+          (!product.hasFamily || isContained(item.title.toLowerCase, familyReg)))
+      ) yield {
         item
       }
     Link(product, itemsProd.toList)
   }
-
 
   /** Find if src contains the regex pattern cont
     *
@@ -259,10 +248,46 @@ object Main {
   private def isContained(src: String, cont: Regex): Boolean = {
     cont.findFirstIn(src).isDefined
   }
-  
-  
-  private def filtreLink(links:List[Link]): List[Link] = {
-    
-    links
+
+  private def filterLinks(links: List[Link]): List[Link] = {
+    for (link <- links) yield {
+      val filtredLink = filterLink(link)
+      val nbFiltred = link.items.size - filtredLink.items.size
+      log.debug("There is : [ " + nbFiltred + " ] filtred item.")
+      filtredLink
+    }
+  }
+
+  private def filterLink(link: Link): Link = {
+    val average = PriceHandler.averageUsdPrice(link).value
+    val standardDeviation = PriceHandler.standardDeviationUsdPrice(link, average)
+
+    val nbItems = link.items.size
+    val expandedDeviation = getExpendedDeviation(standardDeviation, nbItems)
+    val minPrice = average - expandedDeviation
+
+    log.debug("Normal min price is : " + (average - standardDeviation) + " and expanded is : " + minPrice)
+
+    def isGoodItem(item: Item): Boolean = {
+      val price = item.getPrice
+      if (price.isDefined) {
+        val usdPrice = price.get.getUsdPrice
+        minPrice <= usdPrice
+      } else {
+        false
+      }
+    }
+
+    val items =
+      for (item <- link.items if isGoodItem(item)) yield {
+        item
+      }
+
+    Link(link.product, items)
+  }
+
+  private def getExpendedDeviation(deviation: Double, nbItems: Int): Double = {
+    if (nbItems < 25) deviation * (1 / math.sqrt(nbItems) + 0.85)
+    else deviation
   }
 }

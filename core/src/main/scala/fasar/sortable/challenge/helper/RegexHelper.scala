@@ -20,8 +20,7 @@ object RegexHelper {
 
     /** Make a list a delimiters regex compatible */
     private def escapeListChar(chars: Set[Char]): Set[String] = {
-      for (char <- chars)
-      yield {
+      for (char <- chars) yield {
         escapeRegexChar(char)
       }
     }
@@ -62,19 +61,19 @@ object RegexHelper {
     */
   def escapeRegexChar(char: Char): String = {
     char match {
-      case '.' => """\."""
-      case '?' => """\?"""
-      case '(' => """\("""
-      case ')' => """\)"""
+      case '.'  => """\."""
+      case '?'  => """\?"""
+      case '('  => """\("""
+      case ')'  => """\)"""
       case '\\' => """\\"""
-      case ']' => """\]"""
-      case '[' => """\["""
-      case '*' => """\*"""
-      case '|' => """\|"""
-      case '^' => """\^"""
-      case '$' => """\$"""
-      case '+' => """\+"""
-      case _ => char.toString
+      case ']'  => """\]"""
+      case '['  => """\["""
+      case '*'  => """\*"""
+      case '|'  => """\|"""
+      case '^'  => """\^"""
+      case '$'  => """\$"""
+      case '+'  => """\+"""
+      case _    => char.toString
     }
   }
 }

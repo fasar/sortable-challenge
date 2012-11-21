@@ -6,9 +6,8 @@ import fasar.sortable.challenge.converter.Converter
 
 object CsvConverter extends Converter {
 
-  
-  /** Create a CSV file of links 
-    * 
+  /** Create a CSV file of links
+    *
     * It get the JSon data of a list of links. It create
     * A link is a relation between a product and a listing
     *
@@ -19,8 +18,7 @@ object CsvConverter extends Converter {
     val res = links.map { x => convert(x) }
     res.mkString("\n")
   }
-  
-  
+
   /** get the JSon data of a link
     *
     * a link is a relation between a product and a listing
@@ -37,10 +35,10 @@ object CsvConverter extends Converter {
   }
 
   /** get a sorted list of prices with of a list items
-   * 
-   * @param items  param
-   * @retrun       the sorted list of prices
-   */
+    *
+    * @param items  param
+    * @retrun       the sorted list of prices
+    */
   private def getPrices(items: List[Item]): List[Double] = {
     val res =
       (for (
@@ -49,6 +47,6 @@ object CsvConverter extends Converter {
       ) yield {
         price.getUsdPrice
       })
-    res.sortWith(_<_)  
+    res.sortWith(_ < _)
   }
 }

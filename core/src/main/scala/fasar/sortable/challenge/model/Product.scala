@@ -1,6 +1,5 @@
 package fasar.sortable.challenge.model
 
-
 /** Represents a products
   *
   * An Item object represent a line of listing
@@ -16,11 +15,11 @@ package fasar.sortable.challenge.model
   * @author Fabien Sartor
   */
 case class Product(
-                    name: String,
-                    manufacturer: String,
-                    model: String,
-                    announcedDate: String,
-                    family: String = "") {
+    name: String,
+    manufacturer: String,
+    model: String,
+    announcedDate: String,
+    family: String = "") {
 
   def hasFamily = family.size > 0
 
@@ -47,9 +46,8 @@ case class Product(
   }
 }
 
-/**
- * Product object to build product.
- */
+/** Product object to build product.
+  */
 object Product {
 
   /** get a product from a Map[String, String]

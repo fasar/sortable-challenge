@@ -1,36 +1,34 @@
 package fasar.sortable.challenge.model
 
 case class Currency(name: String,
-               acronym: String,
-               usdPice:Double) {
-  
-    // all currencies are located at : http://www.xe.com/iso4217.php
-    //  or and to get symbol : http://www.xe.com/symbols.php
-    //  all currencies with country : http://en.wikipedia.org/wiki/List_of_circulating_currencies_by_country
-    
-    //values of these currencies are http://www.x-rates.com/table/?from=USD&amount=1.00
-    
+                    acronym: String,
+                    usdPice: Double) {
+
+  // all currencies are located at : http://www.xe.com/iso4217.php
+  //  or and to get symbol : http://www.xe.com/symbols.php
+  //  all currencies with country : http://en.wikipedia.org/wiki/List_of_circulating_currencies_by_country
+
+  //values of these currencies are http://www.x-rates.com/table/?from=USD&amount=1.00
+
 }
 
 object Currency {
-  
+
   val currencies: Set[Currency] = CurrencyRawData.currencies
   println(currencies)
-  
-  def getWithSymbol(acronym:String): Option[Currency] = {
-    currencies.collectFirst{case curr if curr.acronym == acronym => curr}
+
+  def getWithSymbol(acronym: String): Option[Currency] = {
+    currencies.collectFirst { case curr if curr.acronym == acronym => curr }
   }
-  
+
   val getUsd = {
     getWithSymbol("USD").get
   }
-  
+
 }
 
-
-
 private object CurrencyRawData {
-  val data:Array[Array[String]] = """Emirati Dirham;AED;0.27224218664924316
+  val data: Array[Array[String]] = """Emirati Dirham;AED;0.27224218664924316
 Argentine Peso;ARS;0.20803129789270539
 Australian Dollar;AUD;1.038107
 Bulgarian Lev;BGN;0.653998283908503
@@ -85,8 +83,8 @@ Trinidadian Dollar;TTD;0.15679633723756214
 Taiwan New Dollar;TWD;0.03434332472231705
 US Dollar;USD;1.0
 Venezuelan Bolivar Fuerte;VEF;0.23255813953488372
-South African Rand;ZAR;0.11293473095333174""".split("\n").map{ line => line.split(";") }
-  
-  val currencies  = data.map{elem => Currency(elem(0), elem(1), elem(2).toDouble)}.toSet
-  
+South African Rand;ZAR;0.11293473095333174""".split("\n").map { line => line.split(";") }
+
+  val currencies = data.map { elem => Currency(elem(0), elem(1), elem(2).toDouble) }.toSet
+
 }

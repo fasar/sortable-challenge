@@ -1,6 +1,5 @@
 package fasar.sortable.challenge.model
 
-
 /** Represents an item
   *
   * An Item object represent a line of listing
@@ -18,23 +17,22 @@ case class Item(title: String,
                 manufacturer: String,
                 currency: String,
                 price: String) {
-  
+
   def getPrice: Option[Price] = {
     try {
       val priceValue = this.price.toDouble
       val currency = Currency.getWithSymbol(this.currency)
-      if(currency.isDefined) Some(Price(currency.get, priceValue))
+      if (currency.isDefined) Some(Price(currency.get, priceValue))
       else None
     } catch {
-      case e:Exception => None
+      case e: Exception => None
     }
-    
+
   }
 }
 
-/**
- * Item object to build item.
- */
+/** Item object to build item.
+  */
 object Item {
   /** get a product from a Map[String, String]
     *

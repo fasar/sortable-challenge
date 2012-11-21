@@ -3,13 +3,11 @@ package fasar.sortable.challenge
 import org.junit.Test
 import org.junit.Assert._
 
-/**
- * Unit test for simple App.
- */
+/** Unit test for simple App.
+  */
 class AppTest {
-  /**
-   * Rigourous Test :-)
-   */
+  /** Rigourous Test :-)
+    */
   @Test
   def testApp(): Unit = {
     assertTrue(true)
