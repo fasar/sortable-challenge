@@ -15,7 +15,7 @@ object JsonConverter extends Converter {
     * It get the JSon data of a list of links.
     * A link is a relation between a product and a listing
     *
-    * @param link  the link
+    * @param links  the link
     * @return      content of JSon file
     */
   def convert(links: List[Link]): String = {

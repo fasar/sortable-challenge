@@ -48,4 +48,20 @@ object Item {
     val price = param.get("price").getOrElse("")
     Item(title, manufacturer, currency, price)
   }
+
+  /** get a product from a List[String]
+    *
+    * This kind of map is returned by the FasarJson
+    * Params are ordered in
+    *  title, manufacturer, currency, price
+    * @param param  param is a map of  "object-name"->"object-value"
+    * @return       return an item
+    */
+  def getItem(param: List[String]) = {
+//    val title = param(0)
+//    val manufacturer = param(1)
+//    val currency = param(2)
+//    val price = param(3)
+    Item(param(0), param(1), param(2), param(3))
+  }
 }

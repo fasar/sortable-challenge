@@ -6,7 +6,7 @@
         <artifactId>sortable-challenge</artifactId>
         <version>1.0-SNAPSHOT</version>
         <!--CHALLENGE_VERSION-->
-        <relativePath>../..</relativePath>
+        <relativePath>..</relativePath>
     </parent>
 
     <groupId>fasar.sortable.challenge</groupId>
@@ -51,7 +51,7 @@
 
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.9.2</artifactId>
+            <artifactId>scalatest_2.10</artifactId>
             <scope>test</scope>
         </dependency>
 

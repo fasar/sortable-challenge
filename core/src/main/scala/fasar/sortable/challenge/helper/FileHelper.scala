@@ -24,7 +24,7 @@ object FileHelper {
   def loadPrivateProperties() {
     try {
       // set up new properties object from file "myProperties.txt"
-      val fileUrl = Loader.getResource("challenge.properties")
+      val fileUrl = Loader.getResource("conf/challenge.properties")
 
       val buff = Source.fromURL(fileUrl)
       val p: Properties = new Properties(System.getProperties())

@@ -17,6 +17,7 @@ import scala.util.matching.Regex
 import scala.collection.immutable.HashSet
 import fasar.sortable.challenge.business.PriceHandler
 import java.io.File
+import fasar.sortable.challenge.json.FasarJson
 
 /** The main object used to execute sortable challenge on the command-line.
   *
@@ -81,11 +82,47 @@ object Main {
 
     // Process record linkage of product with family
     val links = getLinks(listProds, listItems)
+    val fileLinks = scala.util.Marshal.dump(links)
+    val outFileLinks = new java.io.BufferedOutputStream(new java.io.FileOutputStream("Links.obj"))
+    outFileLinks.write(fileLinks )
+    outFileLinks.close()
+
+    val dateEndRecordLinkage = getDate
 
     // filter items with price too below the average price 
     val filtredLinks = filterLinks(links)
+    val fileFiltredLinks = scala.util.Marshal.dump(links)
+    val outFiltredFileLinks = new java.io.BufferedOutputStream(new java.io.FileOutputStream("FiltredLinks.obj"))
+    outFiltredFileLinks.write(fileFiltredLinks )
+    outFiltredFileLinks.close()
 
     val dateEndProcess = getDate
+
+    //TODO: Suppr this § till END TO SUPPR
+    //Just a little addon: get the rejected term.
+    println("Processing bad terms : ")
+    val spliter = Array(' ', '/', '.', ',', '\\', '(', ')')
+    val acceptedTerm:Set[String] =
+      (for(link <- filtredLinks;
+          item <- link.items;
+          term <- item.title.split(spliter))
+      yield {
+        term
+      }).toSet
+    val allTerm:Set[String] =
+      (for(link <- links;
+          item <- link.items;
+          term <- item.title.split(spliter))
+      yield {
+        term
+      }).toSet
+
+    val falseTerms = allTerm diff acceptedTerm
+
+    println("Les mauvais termes sont : ")
+    println(falseTerms.toList.sorted.mkString("  ", "\n  ", "\n"))
+    println("Il y a " + falseTerms.size + " mauvais  termes sont : ")
+    //END TO SUPPR
 
     //Write output
     val converter = JsonConverter
@@ -106,10 +143,13 @@ object Main {
 
     log.debug("It takes " + (dateEndInit - dateStartApp) + " ms to init properties and file")
     log.debug("It takes " + (dateEndLoadData - dateEndInit) + " ms to load data")
-    log.debug("It takes " + (dateEndProcess - dateEndInit) + " ms to process data")
+    log.debug("It takes " + (dateEndProcess - dateEndLoadData) + " ms to process data")
+    log.debug("  and in this time :")
+    log.debug("   It takes " + (dateEndRecordLinkage - dateEndLoadData) + " ms to do the record linkage")
+    log.debug("   It takes " + (dateEndProcess - dateEndRecordLinkage) + " ms to filter records")
     log.debug("It takes " + (dateEndWriting - dateEndProcess) + " ms to write data")
 
-    println("Done with : " + outFic.getCanonicalPath())
+    println("Done in "+ ((dateEndWriting -dateStartApp)/1000) +" sec with : " + outFic.getCanonicalPath())
   }
 
   /** get current date. */
@@ -183,14 +223,21 @@ object Main {
     * @tparam B      Type
     * @return        A list of [B]
     */
-  private def loadData[B](file: URI)(builder: Map[String, String] => B): List[B] = {
+  private def loadData[B](file: URI)(builder: List[String] => B): List[B] = {
     val ficIn = Source.fromURI(file)
     val data =
-      for (line <- ficIn getLines) yield {
-        val productOpt = JSON.parseFull(line)
-        val product = productOpt.get
-        builder(product.asInstanceOf[Map[String, String]])
-      }
+    // This is the old way to get data. It uses JSON object.
+    // JSON parsing is very processing intensive
+//      for (line <- ficIn getLines) yield {
+//        val productOpt = JSON.parseFull(line)
+//        val product = productOpt.get
+//        builder(product.asInstanceOf[Map[String, String]])
+//      }
+    //New way to do the job
+    for (line <- ficIn getLines) yield {
+      val values = FasarJson.parseLine(line)
+      builder(values)
+    }
     val res = data.toList
     ficIn.close()
     res
@@ -265,6 +312,8 @@ object Main {
     val nbItems = link.items.size
     val expandedDeviation = getExpendedDeviation(standardDeviation, nbItems)
     val minPrice = average - expandedDeviation
+    val maxPrice = average + expandedDeviation
+
 
     log.debug("Normal min price is : " + (average - standardDeviation) + " and expanded is : " + minPrice)
 

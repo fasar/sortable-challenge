@@ -65,4 +65,26 @@ object Product {
     val family = param.get("family").getOrElse("")
     Product(name, manufacturer, model, annoncedDate, family)
   }
+
+  /** get a product from a from a List[String]
+    *
+    * This kind of map is returned by the FasarJson
+    * Params are ordered in
+    *  product_name, manufacturer, model, family, announced-date
+    *
+    * @param param  param is a map of  "object-name"->"object-value"
+    * @return       return a product
+    */
+  def getProduct(param: List[String]) = {
+//    val name = param(0)
+//    val manufacturer = param(1)
+//    val model = param(2)
+    val (family, annoncedDate) =
+    if(param.size>4) {
+      (param(3), param(4))
+    } else{
+      ("", param(3))
+    }
+    Product(param(0), param(1), param(2), annoncedDate, family)
+  }
 }
