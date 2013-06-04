@@ -249,7 +249,7 @@ object Main {
     * @param listItems      the listing you want to link with products
     * @return
     */
-  private def getLinks(products: Seq[Product], listItems: ParSeq[Item]) = {
+  private def getLinks(products: Seq[Product], listItems: ParSeq[Item]): List[Link] = {
     @tailrec
     def loop_getLinks(products: Seq[Product], alreadyLinked: Set[Item], acc: List[Link]): List[Link] = {
       products match {
@@ -265,7 +265,7 @@ object Main {
     loop_getLinks(products, HashSet.empty[Item], Nil)
   }
 
-  /** get link between products and items
+  /** get link between a product and items
     *
     * @param product
     * @param listItems

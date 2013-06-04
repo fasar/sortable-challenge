@@ -12,13 +12,26 @@ import scala.collection.immutable.HashMap
  */
 object FasarJson {
 
+  // regex json parser hand made
+//  def parseLine(line: String): List[String] = {
+//    // catch keys values
+//    val reg1 = """"([^:]*)":"((?:(?:(?<=\\)")|[^"])*)"""".r
+//    val list: Iterator[Match] = reg1.findAllMatchIn(line)
+//    (for (keyval <- list if keyval.groupCount > 0)
+//    yield {
+//      unEscapeJson(keyval.subgroups(1))
+//    }).toList
+//  }
+
+  // split and cut parser hand made
   def parseLine(line: String): List[String] = {
-    // catch keys values
-    val reg1 = """"([^:]*)":"((?:(?:(?<=\\)")|[^"])*)"""".r
-    val list: Iterator[Match] = reg1.findAllMatchIn(line)
-    (for (keyval <- list if keyval.groupCount > 0)
+    val res = line.substring(2, line.size-2).split("\",\"|\":\"")
+    var i = -1
+    println(line)
+    (for((elem, i) <- res.zipWithIndex
+         if( i % 2 == 1))
     yield {
-      unEscapeJson(keyval.subgroups(1))
+      elem
     }).toList
   }
 
